@@ -154,10 +154,14 @@ function App() {
   //   return shortest;
   // }
 
-  const resetPath = (shortest) => {
+  const resetPath = (oldShortest, boxes) => {
     let newBoxes = [...boxes];
+    console.log("newboxes for reset", newBoxes, shortest);
     shortest.forEach((i) => {
-      if (!['start', 'end'].includes(newBoxes[i]) && (newBoxes[i] === 'shortest')) newBoxes[i] = 'clear';
+      i = parseInt(i);
+      if (!['start', 'end'].includes(newBoxes[i]) && (newBoxes[i] === 'shortest')) {
+        newBoxes[i] = 'clear';
+      }
     });
     setBoxes(newBoxes);
   }
@@ -165,26 +169,29 @@ function App() {
   const findPath = (visited, boxes) => {
     let graph = {};
     console.log("visited", visited, boxes);
-    const validTypes = ['clear', 'start', 'end'];
+    const validTypes = ['clear', 'start', 'end', 'shortest'];
     visited.forEach((id) => {
       if (boxes[id] === 'filled') return;
       let adjacentSq = {};
-      if (id % cols < cols-1 && validTypes.includes(boxes[id+1])) adjacentSq[id+1] = 1;
-      if (id % cols > 0 && validTypes.includes(boxes[id-1])) adjacentSq[id-1] = 1;
-      if (id + cols < rows * cols && validTypes.includes(boxes[id+cols])) adjacentSq[id+cols] = 1;
-      if (id - cols >= 0 && validTypes.includes(boxes[id-cols])) adjacentSq[id-cols] = 1;
+      if (id % cols < cols-1 && validTypes.includes(boxes[id+1])) adjacentSq[id+1] = 1; // right
+      if (id % cols > 0 && validTypes.includes(boxes[id-1])) adjacentSq[id-1] = 1; // left
+      if (id + cols < rows * cols && validTypes.includes(boxes[id+cols])) adjacentSq[id+cols] = 1; // below
+      if (id - cols >= 0 && validTypes.includes(boxes[id-cols])) adjacentSq[id-cols] = 1; // above
       graph[id] = adjacentSq;
-      console.log(graph[id]);
+      // console.log(graph[id]);
     })
-    console.log(graph);
-    const start = boxes.findIndex((i) => i==='start');
-    const end = boxes.findIndex((i) => i=== 'end');
-    console.log('start, end', start, end);
+    console.log("adj graph", graph);
+    const start = boxes.findIndex((i) => i === 'start');
+    const end = boxes.findIndex((i) => i === 'end');
+    // console.log('start, end', start, end);
     try {
-      const path = find_path(graph, start, end);
+      let path = find_path(graph, start, end);
       console.log(path);
+      path = path.map(i => parseInt(i));
+      resetPath(shortest, boxes);
       setShortest(path);
     } catch {
+      console.log("cannot find path");
       resetPath(shortest, boxes);
       setShortest([]);
     }
@@ -194,27 +201,32 @@ function App() {
   const updateShortest = () => {
     const newBoxes = [...boxes];
     console.log(shortest);
-    shortest.forEach((i) => {
-      if (newBoxes[i] === 'clear') {
-        newBoxes[i] = 'shortest';
-      }
-    })
-    setBoxes(newBoxes);
+    if (shortest.length === 0) {
+      resetPath([], newBoxes);
+    } else {
+      shortest.forEach((i) => {
+        if (newBoxes[i] === 'clear') {
+          newBoxes[i] = 'shortest';
+        }
+      })
+      setBoxes(newBoxes);
+    }
   }
   // update path when add a new path
   useEffect(updateShortest, [shortest]);
+  // useEffect(resetPath, [shortest]);
 
   const verifyPath = (id, boxes, newVisited) => {
-    console.log(boxes, id);
+    // console.log(boxes, id);
     let adjacentSq = [boxes[id-1], boxes[id+1]];
     if (id + cols < rows * cols) adjacentSq.push(boxes[id+cols]);
     if (id - cols >= 0) adjacentSq.push(boxes[id-cols]);
-    console.log("adjacent", adjacentSq);
+    // console.log("adjacent", adjacentSq);
 
     // if ((adjacentSq.includes('start') || adjacentSq.includes('end')) && adjacentSq.includes('clear')) {
     if (adjacentSq.includes('start') || adjacentSq.includes('end')) {
       // time to check for path
-      console.log("there's a clear and a start/end");
+      // console.log("there's a clear and a start/end");
       // let visited = [];
       if (adjacentSq.includes('start')) newVisited.push('start');
       if (adjacentSq.includes('end')) newVisited.push('end');
@@ -242,10 +254,13 @@ function App() {
     let newBoxes = [...boxes];
     let newVisited = [...visited];
     // console.log("id", id);
+    console.log("new boxes", newBoxes);
     if (newBoxes[id] === 'filled') {
+      console.log("filled should be changing", id);
       newBoxes[id] = 'clear';
       newVisited.push(id);
     } else if (['clear', 'shortest'].includes(newBoxes[id])) {
+      console.log("clear should be changing", id);
       newBoxes[id] = 'filled';
       newVisited.filter((i) => i===id);
     }
