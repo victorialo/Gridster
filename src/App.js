@@ -1,9 +1,7 @@
 import React, {useEffect, useState} from 'react';
-// import logo from './logo.svg';
 import styled from 'styled-components'
 import './App.css';
 import Box from './Box'
-// import {render} from "react-dom";
 import { find_path } from 'dijkstrajs';
 
 const DimForm = styled.form`
@@ -49,7 +47,6 @@ function App() {
     newBoxes[start] = 'start';
     newBoxes[end] = 'end';
     setVisited([start, end]);
-    // setBoxes(newBoxes);
     return newBoxes;
   }
   // const initializeBoxes = () => {
@@ -65,7 +62,6 @@ function App() {
   const calcSize = () => {
     // let wid = 1 / rows * 500;
     let hei = 1 / cols * 500;
-    // console.log(wid);
     // const properSize = hei > wid ? `${wid}px` : `${hei}px`;
     // const properSize = ;
     // setSize(properSize);
@@ -156,7 +152,6 @@ function App() {
 
   const resetPath = (oldShortest, boxes) => {
     let newBoxes = [...boxes];
-    console.log("newboxes for reset", newBoxes, shortest);
     shortest.forEach((i) => {
       i = parseInt(i);
       if (!['start', 'end'].includes(newBoxes[i]) && (newBoxes[i] === 'shortest')) {
@@ -168,7 +163,6 @@ function App() {
 
   const findPath = (visited, boxes) => {
     let graph = {};
-    console.log("visited", visited, boxes);
     const validTypes = ['clear', 'start', 'end', 'shortest'];
     visited.forEach((id) => {
       if (boxes[id] === 'filled') return;
@@ -178,20 +172,15 @@ function App() {
       if (id + cols < rows * cols && validTypes.includes(boxes[id+cols])) adjacentSq[id+cols] = 1; // below
       if (id - cols >= 0 && validTypes.includes(boxes[id-cols])) adjacentSq[id-cols] = 1; // above
       graph[id] = adjacentSq;
-      // console.log(graph[id]);
     })
-    console.log("adj graph", graph);
     const start = boxes.findIndex((i) => i === 'start');
     const end = boxes.findIndex((i) => i === 'end');
-    // console.log('start, end', start, end);
     try {
       let path = find_path(graph, start, end);
-      console.log(path);
       path = path.map(i => parseInt(i));
       resetPath(shortest, boxes);
       setShortest(path);
     } catch {
-      console.log("cannot find path");
       resetPath(shortest, boxes);
       setShortest([]);
     }
@@ -200,7 +189,6 @@ function App() {
 
   const updateShortest = () => {
     const newBoxes = [...boxes];
-    console.log(shortest);
     if (shortest.length === 0) {
       resetPath([], newBoxes);
     } else {
@@ -214,30 +202,24 @@ function App() {
   }
   // update path when add a new path
   useEffect(updateShortest, [shortest]);
-  // useEffect(resetPath, [shortest]);
 
   const verifyPath = (id, boxes, newVisited) => {
-    // console.log(boxes, id);
     let adjacentSq = [boxes[id-1], boxes[id+1]];
     if (id + cols < rows * cols) adjacentSq.push(boxes[id+cols]);
     if (id - cols >= 0) adjacentSq.push(boxes[id-cols]);
-    // console.log("adjacent", adjacentSq);
 
     // if ((adjacentSq.includes('start') || adjacentSq.includes('end')) && adjacentSq.includes('clear')) {
     if (adjacentSq.includes('start') || adjacentSq.includes('end')) {
       // time to check for path
-      // console.log("there's a clear and a start/end");
       // let visited = [];
       if (adjacentSq.includes('start')) newVisited.push('start');
       if (adjacentSq.includes('end')) newVisited.push('end');
       // let weights = {};
       // weights[id] = 1;
       // let parents = new Map();
-      // console.log("visited", visited);
       // findShortestPath(id, weights, parents, visited);
     }
     // setVisited(newVisited);
-    // console.log(newVisited, "new visits");
 
     if (newVisited.includes('start') && newVisited.includes('end')) {
       // check for a path
@@ -247,33 +229,24 @@ function App() {
   }
 
   const changeColor = (e) => {
-    // console.log("hi", e.currentTarget);
     e.preventDefault();
     const id = parseInt(e.target.id.split('-')[1]);
     if (['start', 'end'].includes(boxes[id])) return;
     let newBoxes = [...boxes];
     let newVisited = [...visited];
-    // console.log("id", id);
-    console.log("new boxes", newBoxes);
     if (newBoxes[id] === 'filled') {
-      console.log("filled should be changing", id);
       newBoxes[id] = 'clear';
       newVisited.push(id);
     } else if (['clear', 'shortest'].includes(newBoxes[id])) {
-      console.log("clear should be changing", id);
       newBoxes[id] = 'filled';
       newVisited.filter((i) => i===id);
     }
 
-    // console.log(newBoxes);
     setVisited(newVisited);
     setBoxes(newBoxes);
-    console.log("new boxes", newBoxes);
     verifyPath(id, newBoxes, newVisited);
-    // console.log(newBoxes);
     // createGrid(e);
     // const grid = createdGrid(newBoxes);
-    // console.log(grid);
     // setDisplayGrid(grid);
     // return grid;
   }
@@ -284,7 +257,6 @@ function App() {
         {
           // [...Array(rows * cols)].map((_, i) => {
           boxes.map((status, i) => {
-            // console.log(status);
             let div = <Box id={`box-${i}`} size={size} status={status} onClick={changeColor}/>
             return div;
           })
@@ -295,7 +267,6 @@ function App() {
   const [displayGrid, setDisplayGrid] = useState(()=>createdGrid());
 
   const setDims = (event) => {
-    // event.preventDefault;
     if (event.currentTarget.name === 'rows') {
       setRows(parseInt(event.currentTarget.value));
     } else {
