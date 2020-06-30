@@ -273,10 +273,19 @@ function App() {
   const [displayGrid, setDisplayGrid] = useState(()=>createdGrid());
 
   const setDims = (event) => {
+    let value = parseInt(event.currentTarget.value);
+    if (value < 1) {
+      console.error("Dimension should not be smaller than 1.");
+      value = 1;
+    }
+    if (value > 20) {
+      console.error("Dimension should not be greater than 20.");
+      value = 20;
+    }
     if (event.currentTarget.name === 'rows') {
-      setRows(parseInt(event.currentTarget.value));
+      setRows(value);
     } else {
-      setCols(parseInt(event.currentTarget.value));
+      setCols(value);
     }
   }
   const createGrid = (event) => {
