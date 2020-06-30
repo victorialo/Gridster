@@ -10,7 +10,6 @@ const BoxStyle = styled.div`
     box-sizing: border-box;
     width: ${props => props.size};
     height: ${props => props.size};
-    //background-color: lightgray;
     
     &.filled {
       background-color: lightgray;

@@ -31,6 +31,12 @@ const Key = styled.div`
   justify-content: space-evenly;
 `
 
+const KeyColor = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`
+
 function App() {
   const [rows, setRows] = useState(10);
   const [cols, setCols] = useState(10);
@@ -308,11 +314,21 @@ function App() {
 
       <h2>Key</h2>
       <Key>
-        Filled <Box status={"filled"} size={size}/>
-        Clear <Box status={"clear"} size={size}/>
-        Start <Box status={"start"} size={size}/>
-        End <Box status={"end"} size={size}/>
-        Shortest Path <Box status={"shortest"} size={size}/>
+        <KeyColor>
+          Filled <Box status={"filled"} size={size}/>
+        </KeyColor>
+        <KeyColor>
+          Clear <Box status={"clear"} size={size}/>
+        </KeyColor>
+        <KeyColor>
+          Start <Box status={"start"} size={size}/>
+        </KeyColor>
+        <KeyColor>
+          End <Box status={"end"} size={size}/>
+        </KeyColor>
+        <KeyColor>
+          Shortest Path <Box status={"shortest"} size={size}/>
+        </KeyColor>
       </Key>
 
     </div>
